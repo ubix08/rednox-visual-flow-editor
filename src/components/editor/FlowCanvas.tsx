@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import {
   ReactFlow,
   Background,
@@ -7,14 +7,13 @@ import {
   Panel,
   ReactFlowProvider,
   useReactFlow,
-  OnSelectionChangeParams,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useFlowStore } from "@/store/flow-store";
 import { CustomNode } from "./CustomNode";
 import { v4 as uuidv4 } from "uuid";
 import { Button } from "@/components/ui/button";
-import { Maximize } from "lucide-react";
+import { Maximize, Save } from "lucide-react";
 const nodeTypes = {
   rednoxNode: CustomNode,
 };
@@ -26,8 +25,6 @@ function FlowCanvasInner() {
   const onConnect = useFlowStore((s) => s.onConnect);
   const addNode = useFlowStore((s) => s.addNode);
   const getNodeDef = useFlowStore((s) => s.getNodeDef);
-  const setSelectedNodeId = useFlowStore((s) => s.setSelectedNodeId);
-  const selectedNodeId = useFlowStore((s) => s.selectedNodeId);
   const { screenToFlowPosition, fitView } = useReactFlow();
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const onDragOver = useCallback((event: React.DragEvent) => {
@@ -48,28 +45,16 @@ function FlowCanvasInner() {
         id: uuidv4(),
         type: "rednoxNode",
         position,
-        data: {
+        data: { 
           label: def?.label || type,
           type: type,
-          config: { id: uuidv4(), type, wires: [], name: def?.label || type }
+          config: { type, wires: [] } 
         },
       };
       addNode(newNode);
     },
     [screenToFlowPosition, addNode, getNodeDef]
   );
-  const onSelectionChange = useCallback(({ nodes: selectedNodes }: OnSelectionChangeParams) => {
-    if (selectedNodes.length > 0) {
-      setSelectedNodeId(selectedNodes[0].id);
-    } else {
-      setSelectedNodeId(null);
-    }
-  }, [setSelectedNodeId]);
-  const onNodesDelete = useCallback((deleted: any[]) => {
-    if (deleted.some(n => n.id === selectedNodeId)) {
-      setSelectedNodeId(null);
-    }
-  }, [selectedNodeId, setSelectedNodeId]);
   return (
     <div className="h-full w-full" ref={reactFlowWrapper}>
       <ReactFlow
@@ -80,8 +65,6 @@ function FlowCanvasInner() {
         onConnect={onConnect}
         onDrop={onDrop}
         onDragOver={onDragOver}
-        onSelectionChange={onSelectionChange}
-        onNodesDelete={onNodesDelete}
         nodeTypes={nodeTypes}
         fitView
       >
