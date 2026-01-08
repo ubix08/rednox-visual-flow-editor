@@ -77,7 +77,10 @@ function updateWranglerJsonc() {
 }
 
 function runSetupCommands() {
-    const commands = [];
+    const commands = [
+    "bun add @monaco-editor/react@^4.6.0",
+    "bun add @xyflow/react@^12.0.0"
+];
     
     if (commands.length === 0) {
         console.log('⊘ No setup commands to run');
