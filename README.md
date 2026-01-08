@@ -1,6 +1,6 @@
 # Cloudflare Workers + React Template
 
-[cloudflarebutton]
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/ubix08/rednox-visual-flow-editor)
 
 A production-ready full-stack template combining Cloudflare Workers (backend API with Hono) and React (frontend with Vite, Tailwind CSS, and shadcn/ui). Built for rapid development, deployment, and scaling on Cloudflare's edge network.
 
@@ -95,7 +95,7 @@ wrangler deploy
 - Worker handles `/api/*` routes first
 - Custom domain: Update `wrangler.jsonc`
 
-[cloudflarebutton]
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/ubix08/rednox-visual-flow-editor)
 
 ### Environment Variables
 Configure in Cloudflare dashboard or `wrangler.toml`:
