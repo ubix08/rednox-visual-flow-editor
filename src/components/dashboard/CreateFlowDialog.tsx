@@ -1,9 +1,9 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Loader2 } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { api } from '@/lib/api';
 import {
   Dialog,
@@ -37,7 +37,7 @@ export function CreateFlowDialog() {
     resolver: zodResolver(flowSchema),
     defaultValues: { label: '', description: '' },
   });
-  const onSubmit = useCallback(async (values: FlowFormValues) => {
+  async function onSubmit(values: FlowFormValues) {
     try {
       const newFlow = await api.createFlow({
         label: values.label,
@@ -47,14 +47,11 @@ export function CreateFlowDialog() {
       });
       toast.success('Flow created successfully');
       setOpen(false);
-      // Brief delay to allow dialog closure before navigation
-      setTimeout(() => {
-        navigate(`/flow/${newFlow.id}`);
-      }, 100);
+      navigate(`/flow/${newFlow.id}`);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to create flow');
     }
-  }, [navigate]);
+  }
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -101,7 +98,6 @@ export function CreateFlowDialog() {
             />
             <DialogFooter>
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 {form.formState.isSubmitting ? "Creating..." : "Create Flow"}
               </Button>
             </DialogFooter>

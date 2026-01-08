@@ -1,5 +1,5 @@
-import { ApiResponse, FlowConfig, NodeDef, SystemStats, DebugLog, ExecutionResponse } from "@/types/rednox";
-const BASE_URL = "/api";
+import { ApiResponse, FlowConfig, NodeDef, SystemStats } from "@/types/rednox";
+const BASE_URL = "https://rednox.ubixsnow08.workers.dev/api";
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${BASE_URL}${path}`, {
     ...options,
@@ -41,10 +41,4 @@ export const api = {
     request<{ message: string }>("/admin/init", {
       method: "POST",
     }),
-  executeFlow: (id: string, payload: any) =>
-    request<ExecutionResponse>(`/admin/flows/${id}/execute`, {
-      method: "POST",
-      body: JSON.stringify(payload),
-    }),
-  getLogs: (id: string) => request<DebugLog[]>(`/admin/flows/${id}/logs`),
 };

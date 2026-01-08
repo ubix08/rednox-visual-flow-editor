@@ -39,19 +39,6 @@ export interface SystemStats {
   uptime: number;
   isInitialized: boolean;
 }
-export interface DebugLog {
-  id: string;
-  timestamp: string;
-  level: 'info' | 'warn' | 'error';
-  nodeId?: string;
-  topic?: string;
-  payload: any;
-}
-export interface ExecutionResponse {
-  success: boolean;
-  executionId: string;
-  startTime: string;
-}
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
