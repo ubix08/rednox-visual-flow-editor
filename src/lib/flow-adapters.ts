@@ -5,7 +5,7 @@ export function toReactFlow(flow: FlowConfig) {
     id: n.id,
     type: "rednoxNode",
     position: { x: n.x || 0, y: n.y || 0 },
-    data: { 
+    data: {
       label: n.name || n.type,
       type: n.type,
       config: n
@@ -37,7 +37,7 @@ export function fromReactFlow(
   existingFlow: Partial<FlowConfig> = {}
 ): FlowConfig {
   const rednoxNodes: RedNoxNode[] = nodes.map((node) => {
-    const config = (node.data?.config as RedNoxNode) || {};
+    const config = (node.data?.config as Partial<RedNoxNode>) || {};
     // Group edges by source handle index
     const wires: string[][] = [];
     const nodeEdges = edges.filter((e) => e.source === node.id);
@@ -55,8 +55,8 @@ export function fromReactFlow(
       y: Math.round(node.position.y),
       z: id,
       wires: wires,
-      name: (node.data?.label as string) || config.name,
-    };
+      name: (node.data?.label as string) || (config.name as string) || "",
+    } as RedNoxNode;
   });
   return {
     id,

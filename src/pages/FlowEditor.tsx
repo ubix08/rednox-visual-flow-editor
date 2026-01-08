@@ -8,10 +8,11 @@ import { useFlowStore } from "@/store/flow-store";
 import { toReactFlow, fromReactFlow } from "@/lib/flow-adapters";
 import { NodePalette } from "@/components/editor/NodePalette";
 import { FlowCanvas } from "@/components/editor/FlowCanvas";
-import { 
-  ResizableHandle, 
-  ResizablePanel, 
-  ResizablePanelGroup 
+import { PropertyEditor } from "@/components/editor/PropertyEditor";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup
 } from "@/components/ui/resizable";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Save, Play, Loader2 } from "lucide-react";
@@ -22,7 +23,7 @@ export function FlowEditor() {
   const setEdges = useFlowStore((s) => s.setEdges);
   const nodes = useFlowStore((s) => s.nodes);
   const edges = useFlowStore((s) => s.edges);
-  const { data: flow, isLoading, error } = useQuery({
+  const { data: flow, isLoading } = useQuery({
     queryKey: ["flow", id],
     queryFn: () => api.getFlow(id!),
     enabled: !!id,
@@ -41,7 +42,7 @@ export function FlowEditor() {
       await api.updateFlow(id, updatedFlow);
       toast.success("Flow saved and deployed");
     } catch (err) {
-      toast.error("Failed to save flow");
+      toast.error("Failed to save flow: " + (err instanceof Error ? err.message : "Unknown error"));
     }
   };
   if (isLoading) {
@@ -82,21 +83,16 @@ export function FlowEditor() {
       </div>
       <div className="flex-1 min-h-0">
         <ResizablePanelGroup direction="horizontal">
-          <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
+          <ResizablePanel defaultSize={18} minSize={15} maxSize={30}>
             <NodePalette />
           </ResizablePanel>
           <ResizableHandle withHandle />
-          <ResizablePanel defaultSize={60}>
+          <ResizablePanel defaultSize={62}>
             <FlowCanvas />
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize={20} minSize={15} maxSize={40}>
-            <div className="h-full border-l bg-background flex flex-col p-4">
-              <h3 className="text-xs font-bold uppercase text-muted-foreground mb-4">Properties</h3>
-              <div className="flex-1 flex items-center justify-center text-center text-muted-foreground p-8 border-2 border-dashed rounded-lg">
-                <p className="text-sm">Select a node to edit its configuration</p>
-              </div>
-            </div>
+            <PropertyEditor />
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
