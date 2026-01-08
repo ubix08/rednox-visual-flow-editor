@@ -1,20 +1,24 @@
 import { create } from "zustand";
-import { 
-  Node, 
-  Edge, 
-  OnNodesChange, 
-  OnEdgesChange, 
-  applyNodeChanges, 
-  applyEdgeChanges, 
-  addEdge, 
-  Connection 
+import {
+  Node,
+  Edge,
+  OnNodesChange,
+  OnEdgesChange,
+  applyNodeChanges,
+  applyEdgeChanges,
+  addEdge,
+  Connection
 } from "@xyflow/react";
-import { NodeDef } from "@/types/rednox";
+import { NodeDef, DebugLog } from "@/types/rednox";
 interface FlowState {
   nodes: Node[];
   edges: Edge[];
   nodeDefs: Record<string, NodeDef>;
   selectedNodeId: string | null;
+  logs: DebugLog[];
+  isDeploying: boolean;
+  isExecuting: boolean;
+  hasUnsavedChanges: boolean;
   setNodes: (nodes: Node[]) => void;
   setEdges: (edges: Edge[]) => void;
   setNodeDefs: (defs: NodeDef[]) => void;
@@ -25,12 +29,21 @@ interface FlowState {
   addNode: (node: Node) => void;
   getNodeDef: (type: string) => NodeDef | undefined;
   updateNodeData: (id: string, data: any) => void;
+  addLog: (log: DebugLog) => void;
+  clearLogs: () => void;
+  setIsDeploying: (val: boolean) => void;
+  setIsExecuting: (val: boolean) => void;
+  setHasUnsavedChanges: (val: boolean) => void;
 }
 export const useFlowStore = create<FlowState>((set, get) => ({
   nodes: [],
   edges: [],
   nodeDefs: {},
   selectedNodeId: null,
+  logs: [],
+  isDeploying: false,
+  isExecuting: false,
+  hasUnsavedChanges: false,
   setNodes: (nodes) => set({ nodes }),
   setEdges: (edges) => set({ edges }),
   setNodeDefs: (defs) => {
@@ -44,21 +57,25 @@ export const useFlowStore = create<FlowState>((set, get) => ({
   onNodesChange: (changes) => {
     set({
       nodes: applyNodeChanges(changes, get().nodes),
+      hasUnsavedChanges: true
     });
   },
   onEdgesChange: (changes) => {
     set({
       edges: applyEdgeChanges(changes, get().edges),
+      hasUnsavedChanges: true
     });
   },
   onConnect: (connection) => {
     set({
       edges: addEdge(connection, get().edges),
+      hasUnsavedChanges: true
     });
   },
   addNode: (node) => {
     set({
       nodes: [...get().nodes, node],
+      hasUnsavedChanges: true
     });
   },
   getNodeDef: (type) => {
@@ -66,6 +83,7 @@ export const useFlowStore = create<FlowState>((set, get) => ({
   },
   updateNodeData: (id, newData) => {
     set({
+      hasUnsavedChanges: true,
       nodes: get().nodes.map((node) => {
         if (node.id === id) {
           return {
@@ -73,9 +91,7 @@ export const useFlowStore = create<FlowState>((set, get) => ({
             data: {
               ...node.data,
               ...newData,
-              // If the name is changed in newData, we update the top-level label for visual sync
               label: newData.name ?? newData.label ?? node.data.label,
-              // Deep merge the config object if present
               config: {
                 ...(node.data.config as object),
                 ...(newData.config || newData),
@@ -87,4 +103,9 @@ export const useFlowStore = create<FlowState>((set, get) => ({
       }),
     });
   },
+  addLog: (log) => set((state) => ({ logs: [log, ...state.logs].slice(0, 100) })),
+  clearLogs: () => set({ logs: [] }),
+  setIsDeploying: (val) => set({ isDeploying: val }),
+  setIsExecuting: (val) => set({ isExecuting: val }),
+  setHasUnsavedChanges: (val) => set({ hasUnsavedChanges: val }),
 }));
