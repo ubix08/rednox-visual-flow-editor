@@ -79,7 +79,8 @@ function updateWranglerJsonc() {
 function runSetupCommands() {
     const commands = [
     "bun add @monaco-editor/react@^4.6.0",
-    "bun add @xyflow/react@^12.0.0"
+    "bun add @xyflow/react@^12.0.0",
+    "bun add @xyflow/react"
 ];
     
     if (commands.length === 0) {
